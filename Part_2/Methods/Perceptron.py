@@ -7,17 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tkinter.filedialog import askopenfilename
 
-class Layer:
-    def __init__(self, number_of_nodes, inputs, activation, learning_rate=0.001):
-        self.weights = np.random.rand(number_of_nodes)
-        self.biases = np.random.rand(number_of_nodes)
-        self.activ = activation
-        self.lr = learning_rate
-        self.inputs = inputs
 
-    def forward(self):
-        z = self.inputs @ self.weights + self.biases
-        return Z
 
 class Data_options:
 
@@ -58,40 +48,81 @@ class Data_options:
 
     def get_data(self):
         if self.dataset == "training":
-            return zip(self.train_x, self.train_y, self.test_x, self.test_y)
+            return {"Train_in" : self.train_x, "Train_out" : self.train_y, "Test_in" : self.test_x, "Test_out" : self.test_y}
         else:
-            return self.test_x
+            return {"Test_in": self.test_x}
 
-class functions:
-    def __init__(self):
-        h=0
+class Functions:
 
-    def relu(self,input):
-        output = max(0,input)
-        return output
+
+
+    def accuracy(self, predictions, true_classes):
+
+        total_num = len(predictions)
+        total_accuracy=0
+        for predicted_class_idx, predicted_class in enumerate(predictions):
+
+            if predicted_class == true_classes[predicted_class_idx]:
+                total_accuracy += 1
+
+        accuracy = total_accuracy/total_num * 100
+        print(f"Accuracy is : {accuracy:.2f}%")
+        return accuracy
 
     def loss(self,prediction,true_value):
         loss = abs(true_value-prediction)
         return loss
 
-    def train(self):
-        h=0
 
-    def fit(self):
-        h=0
 
-    def predict(self):
-        h=0
+class Perceptron(object):
+
+    def __init__(self, learning_rate = 0.01, epochs = 10):
+        self.lr = learning_rate
+        self.epochs = epochs
+
+    def relu(self,input):
+        output = np.maximum(0,input)
+        return output
+
+    def weighted_sum(self,input):
+        return np.dot(input,self.weights.T) + self.bias
+
+    def fit(self,X,y):
+        self.n_classes = int(y.max()) + 1
+        self.weights = np.random.rand(self.n_classes,X.shape[1])
+        self.bias = np.random.rand(self.n_classes)
+        self.errors = []
+
+        for _ in range(self.epochs):
+            error = 0
+            for xi, yi in zip(X,y):
+                y_pred = self.predict(xi)
+                if y_pred != yi:
+                    self.weights[yi] += self.lr * xi
+                    self.bias[yi] += self.lr
+                    self.weights[y_pred] -= self.lr * xi
+                    self.bias[y_pred] -= self.lr
+
+
+    def predict(self,input):
+        return np.argmax(self.weighted_sum(input))
 
 def main():
-    func=functions()
+    func=Functions()
     data_class=Data_options()
-    data_class.transform_to_image()
-    number_of_layers=2
-    model = 0
-    for layer_num in range(number_of_layers):
-        model.add(Layer(num_nodes,inputs=model[-1], activation = func.relu()))
-    func.fit(model)
+    data = data_class.get_data()
+    # data_class.transform_to_image()
+    number_of_layers=1
+    percep = Perceptron()
+    X = data["Train_in"].to_numpy(dtype=float)
+    y = data["Train_out"].to_numpy(dtype=int)
+    percep.fit(X,y)
+    test_x = data["Test_in"].to_numpy(dtype=float)
+    test_y = data["Test_out"].to_numpy(dtype=float)
+    y_pred = np.array([percep.predict(x) for x in test_x])
+    func.accuracy(y_pred,test_y)
+    print(np.c_[y_pred,test_y])
 
 
 main()
