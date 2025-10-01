@@ -1,5 +1,5 @@
 """
-
+Task 2 for IDL, group 22
 """
 
 import pandas as pd
@@ -89,8 +89,6 @@ class Functions:
         NLL = -np.log(scores[np.arange(num_samples),true_value.flatten()]+epsilon)
         loss = np.mean(NLL)
         return round(loss,4)
-
-
 
 class Perceptron(object):
 
