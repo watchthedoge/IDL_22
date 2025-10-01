@@ -127,8 +127,8 @@ class Perceptron(object):
         """
         initializers = ["random", "ones", "zeros", "normal"]
         # assert update rule is perceptron rule pr or gradient descent gd
-        if update != "pr" and update != "gd":
-            raise ValueError("Pick update rule == gd or pr")
+        if update != "perception_rule" and update != "gradient_descent":
+            raise ValueError("Pick update rule == gradient_descent or perception_rule")
         if weight_initializer not in initializers:
             raise ValueError("Weight initializer is invalid")
         if bias_initializer not in initializers:
@@ -159,13 +159,13 @@ class Perceptron(object):
             scores, predictions = self.predict(X)
             scores = func.softmax(scores)
             for xi, yi, score, y_pred in zip(X,y,scores,predictions):
-                if update == "pr":
+                if update == "perception_rule":
                     if y_pred != yi:
                         self.weights[yi] += self.lr * xi
                         self.bias[yi] += self.lr
                         self.weights[y_pred] -= self.lr * xi
                         self.bias[y_pred] -= self.lr
-                elif update == "gd":
+                elif update == "gradient_descent":
                     self.weights[yi] -= self.lr*(score[yi]-1)*xi
                     self.bias[yi] -= self.lr*(score[yi]-1)
 
@@ -222,10 +222,13 @@ def plot_multiple_histories(histories,title=None):
 
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
+
+    #automatically setting up colors for loss/acc and avoiding whitewashed ones
     n=len(histories)+int(ceil(1.25*len(histories)))
     i=int(ceil(0.25*n))
     cmap_blue = plt.get_cmap('Blues', n)
     cmap_red = plt.get_cmap('Reds', n)
+
     for history in histories:
 
         if not history["Label"]:
@@ -269,7 +272,7 @@ def main(verbose=False,grid_search=False):
     # data_class.transform_to_image()
 
     initializers=["random","ones","zeros","normal"]
-    updaters=["pr","gd"]
+    updaters=["perception_rule","gradient_descent"]
     learning_rates=[1,0.1,0.001,0.0001,0.00001]
     epochs=[5,10,25,50,100,250,500]
     number_of_runs = 10
@@ -279,6 +282,7 @@ def main(verbose=False,grid_search=False):
     test_x = data["Test_in"].to_numpy(dtype=float)
     test_y = data["Test_out"].to_numpy(dtype=int)
 
+    #you can close this statement, this was just a curiosity of mine
     if grid_search:
         lowest_loss = np.inf
         highest_accuracy = 0
@@ -328,12 +332,11 @@ def main(verbose=False,grid_search=False):
         histories=[]
         for num_run in range(number_of_runs):
             #best parameters
-            epoch=50
+            epoch=100
             lr=0.001
-            weight_init="zeros"
-            bias_init = "random"
-            updater = "gd"
-            #ie write "learning rate: {lr}"/"run {num_run}"
+            weight_init="normal"
+            bias_init = "normal"
+            updater = "gradient_descent"
             label = f"Run number {num_run}"
             percep = Perceptron(learning_rate=lr, epochs=epoch)
             history = percep.fit(X=X, y=y,
