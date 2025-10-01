@@ -166,6 +166,9 @@ class Perceptron(object):
                         self.weights[y_pred] -= self.lr * xi
                         self.bias[y_pred] -= self.lr
                 elif update == "gradient_descent":
+                    #So this is what I think is the gradient descent from the book,
+                    # the score value - the certainty that it is that class is equal to the gradient? not sure but it
+                    # seems to work so maybe good ????
                     self.weights[yi] -= self.lr*(score[yi]-1)*xi
                     self.bias[yi] -= self.lr*(score[yi]-1)
 
