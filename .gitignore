@@ -1,9 +1,14 @@
 .venv/
 *.h5
 *.npy
-*.csvIDL_22_backup/
+<<<<<<< HEAD
+*.csv
+IDL_22_backup/
 IDL_22_temp/
 .venv/
 .h5
 *.h5
 *.csv
+=======
+*.csv
+>>>>>>> origin/main
