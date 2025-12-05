@@ -1,6 +1,7 @@
 .venv/
 *.h5
 *.npy
+*.keras
 <<<<<<< HEAD
 *.csv
 IDL_22_backup/
